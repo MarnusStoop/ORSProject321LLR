@@ -5,10 +5,8 @@ using System.Text;
 
 namespace ORSProjectModels
 {
-    class Program
+    public static class RevisedTwoPhaseSimplex
     {
-        static void Main(string[] args)
-        {
-        }
+
     }
 }

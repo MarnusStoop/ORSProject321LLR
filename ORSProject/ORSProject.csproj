@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{92500B01-5416-4B92-85A7-508F8C8E5E9B}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{99D7BFAB-0D1F-46A3-A1C5-C5660AF299FA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ORSProjectModels</RootNamespace>
-    <AssemblyName>ORSProjectModels</AssemblyName>
+    <RootNamespace>ORSProject</RootNamespace>
+    <AssemblyName>ORSProject</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -33,9 +33,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,26 +43,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithms\BranchAndBound.cs" />
-    <Compile Include="Algorithms\CuttingPlane.cs" />
-    <Compile Include="Algorithms\DualSimplex.cs" />
-    <Compile Include="Algorithms\MathematicalPreliminaries.cs" />
-    <Compile Include="Algorithms\PrimalSimplex.cs" />
-    <Compile Include="Algorithms\RevisedDualSimplex.cs" />
-    <Compile Include="Algorithms\RevisedSimplex.cs" />
-    <Compile Include="Algorithms\RevisedTwoPhaseSimplex.cs" />
-    <Compile Include="Algorithms\TwoPhaseSimplex.cs" />
-    <Compile Include="Misc\CommonFunctions.cs" />
-    <Compile Include="Misc\Pivoting.cs" />
-    <Compile Include="Misc\Util.cs" />
-    <Compile Include="Models\Constraint.cs" />
-    <Compile Include="Models\Enums.cs" />
-    <Compile Include="Data Handlers\FileHandler.cs" />
-    <Compile Include="Models\Matrix.cs" />
-    <Compile Include="Models\Model.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Models\SignRestriction.cs" />
-    <Compile Include="Models\Structs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ORSProjectModels\ORSProjectModels\ORSProjectModels.csproj">
+      <Project>{92500B01-5416-4B92-85A7-508F8C8E5E9B}</Project>
+      <Name>ORSProjectModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

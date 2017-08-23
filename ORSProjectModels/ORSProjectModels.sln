@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORSProjectModels", "ORSProjectModels\ORSProjectModels.csproj", "{92500B01-5416-4B92-85A7-508F8C8E5E9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORSProject", "..\ORSProject\ORSProject.csproj", "{99D7BFAB-0D1F-46A3-A1C5-C5660AF299FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +15,10 @@ Global
 		{92500B01-5416-4B92-85A7-508F8C8E5E9B}.Debug|x86.Build.0 = Debug|x86
 		{92500B01-5416-4B92-85A7-508F8C8E5E9B}.Release|x86.ActiveCfg = Release|x86
 		{92500B01-5416-4B92-85A7-508F8C8E5E9B}.Release|x86.Build.0 = Release|x86
+		{99D7BFAB-0D1F-46A3-A1C5-C5660AF299FA}.Debug|x86.ActiveCfg = Debug|x86
+		{99D7BFAB-0D1F-46A3-A1C5-C5660AF299FA}.Debug|x86.Build.0 = Debug|x86
+		{99D7BFAB-0D1F-46A3-A1C5-C5660AF299FA}.Release|x86.ActiveCfg = Release|x86
+		{99D7BFAB-0D1F-46A3-A1C5-C5660AF299FA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
