@@ -7,26 +7,11 @@ namespace ORSProjectModels
 {
     public class CanonicalGenerator
     {
-        private static CanonicalGenerator instance;
-        private Model model;
+        private static Model model;
 
-        private CanonicalGenerator()
+        public static double[][] GenerateCanonicalForm(Model _model, Algorithm algorithmToGenerateFor)
         {
-
-        }
-
-        public static CanonicalGenerator GetInstance()
-        {
-            if (instance == null)
-            {
-                instance = new CanonicalGenerator();
-            }
-            return instance;
-        }
-
-        public double[][] GenerateCanonicalForm(Model model, Algorithm algorithmToGenerateFor)
-        {
-            this.model = model;
+            model = _model;
             switch (algorithmToGenerateFor)
             {
                 case Algorithm.PrimalSimplex:
@@ -50,7 +35,7 @@ namespace ORSProjectModels
             }
         }
 
-        private double[][] GenerateSimplexCanonical(Model model)
+        private static double[][] GenerateSimplexCanonical(Model model)
         {
             double[][] canonical;
             int numberOfRows = 0;
@@ -110,17 +95,17 @@ namespace ORSProjectModels
             return canonical;
         }
 
-        private void AddSlackVariable(int index)
+        private static void AddSlackVariable(int index)
         {
             model.DecisionVariables.Add("s" + (index + 1));
         }
 
-        private void AddExcessVariable(int index)
+        private static void AddExcessVariable(int index)
         {
             model.DecisionVariables.Add("e" + (index + 1));
         }
 
-        private double[] ConvertObjective()
+        private static double[] ConvertObjective()
         {
             int numberOfColumns = model.Constraints.Count;
             List<double> converted = new List<double>();
@@ -140,14 +125,14 @@ namespace ORSProjectModels
             return converted.ToArray();
         }
 
-        private double[][] GenerateTwoPhaseSimplexCanonical(Model model)
+        private static double[][] GenerateTwoPhaseSimplexCanonical(Model model)
         {
             double[][] canonical = new double[2][];
 
             return canonical;
         }
 
-        private double[][] GenerateDualSimplexCanonical(Model model)
+        private static double[][] GenerateDualSimplexCanonical(Model model)
         {
             double[][] canonical;
             int numberOfRows = 0;
@@ -173,39 +158,88 @@ namespace ORSProjectModels
             }
             int numberOfColumns = model.DecisionVariables.Count + 1;
             canonical = new double[numberOfRows + 1][];
-
+            canonical[0] = ConvertObjective();
+            for (int i = 0; i < model.Constraints.Count; i++)
+            {
+                List<double> additional = new List<double>();
+                foreach (var item in model.DecisionVariables)
+                {
+                    if (item.Contains("s"))
+                    {
+                        if (item == "s" + (i + 1))
+                        {
+                            additional.Add(1);
+                        } else
+                        {
+                            additional.Add(0);
+                        }
+                    } else if (item.Contains("e"))
+                    {
+                        if (item == "e" + (i + 1))
+                        {
+                            additional.Add(-1);
+                        } else
+                        {
+                            additional.Add(0);
+                        }
+                    }
+                }
+                canonical[i + 1] = model.Constraints[i].Coefficients.Concat(additional.ToArray()).Concat(new double[] { model.Constraints[i].RHS }).ToArray();
+                if (isExcessRow(canonical[i + 1]))
+                {
+                    for (int j = 0; j < canonical[i + 1].Length; j++)
+                    {
+                        canonical[i + 1][j] *= -1;
+                    }
+                }
+            }
             return canonical;
         }
 
-        private double[][] GenerateRevisedSimplexCanonical(Model model)
+        private static bool isExcessRow(double[] values)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (i < model.DecisionVariables.Count && model.DecisionVariables[i].Contains("e"))
+                {
+                    if (values[i] == -1)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static double[][] GenerateRevisedSimplexCanonical(Model model)
         {
             double[][] canonical = new double[2][];
 
             return canonical;
         }
 
-        private double[][] GenerateRevisedTwoPhaseSimplexCanonical(Model model)
+        private static double[][] GenerateRevisedTwoPhaseSimplexCanonical(Model model)
         {
             double[][] canonical = new double[2][];
 
             return canonical;
         }
 
-        private double[][] GenerateRevisedDualSimplexCanonical(Model model)
+        private static double[][] GenerateRevisedDualSimplexCanonical(Model model)
         {
             double[][] canonical = new double[2][];
 
             return canonical;
         }
 
-        private double[][] GenerateBranchAndBoundCanonical(Model model)
+        private static double[][] GenerateBranchAndBoundCanonical(Model model)
         {
             double[][] canonical = new double[2][];
 
             return canonical;
         }
 
-        private double[][] GenerateCuttingPlaneCanonical(Model model)
+        private static double[][] GenerateCuttingPlaneCanonical(Model model)
         {
             double[][] canonical = new double[2][];
 

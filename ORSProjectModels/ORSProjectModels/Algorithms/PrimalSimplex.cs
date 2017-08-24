@@ -17,10 +17,13 @@ namespace ORSProjectModels
                 return;
             }
             model = _model;
-            model.CanonicalForm = CanonicalGenerator.GetInstance().GenerateCanonicalForm(model, Algorithm.PrimalSimplex);
+            if (model.CanonicalForm == null)
+            {
+                model.CanonicalForm = CanonicalGenerator.GenerateCanonicalForm(model, Algorithm.PrimalSimplex);
+            }
             double[][] table = model.CanonicalForm;
             Console.WriteLine(model.GenerateDisplayableCanonical());
-            do
+            while (CheckIfOptimal(table) == false)
             {
                 //Console.WriteLine("Running");
                 double[] zRow = table[0];
@@ -31,45 +34,8 @@ namespace ORSProjectModels
                 int pivotRowIndex = IdentifyPivotRow(columnValues, rhsValues);
                 //Console.WriteLine(pivotRowIndex);
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
-                Console.WriteLine(GenerateTableIteration(table));
-            } while (CheckIfOptimal(table) == false);
-            //while (CheckIfOptimal(table) == false)
-            //{
-            //    Console.WriteLine("Running");
-            //    double[] zRow = table[0];
-            //    int pivotColumnIndex = IdentifyPivotColumn(zRow);
-            //    Console.WriteLine(pivotColumnIndex);
-            //    double[] rhsValues = table[table.Length - 1];
-            //    double[] columnValues = GetPivotColumnValues(table, pivotColumnIndex);
-            //    int pivotRowIndex = IdentifyPivotRow(columnValues, rhsValues);
-            //    Console.WriteLine(pivotRowIndex);
-            //    table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
-            //}
-        }
-
-        private static string GenerateTableIteration(double[][] table)
-        {
-            string displayable = "";
-            foreach (var item in model.DecisionVariables)
-            {
-                displayable += item + " ";
+                Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables,table));
             }
-            displayable += "\n";
-            foreach (var item in table)
-            {
-                foreach (var val in item)
-                {
-                    if (val < 0)
-                    {
-                        displayable += val + " ";
-                    } else
-                    {
-                        displayable += val + "  ";
-                    }
-                }
-                displayable += "\n";
-            }
-            return displayable;
         }
 
         private static double[] GetRHSValues(double[][] table)

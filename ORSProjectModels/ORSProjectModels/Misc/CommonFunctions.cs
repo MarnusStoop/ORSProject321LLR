@@ -20,5 +20,30 @@ namespace ORSProjectModels
             return false;
         }
 
+        public static string GenerateTableIteration(List<string> decisionVariables,double[][] table)
+        {
+            string displayable = "";
+            foreach (var item in decisionVariables)
+            {
+                displayable += item + " ";
+            }
+            displayable += "RHS\n";
+            foreach (var item in table)
+            {
+                foreach (var val in item)
+                {
+                    if (val < 0)
+                    {
+                        displayable += val + " ";
+                    } else
+                    {
+                        displayable += val + "  ";
+                    }
+                }
+                displayable += "\n";
+            }
+            return displayable;
+        }
+
     }
 }

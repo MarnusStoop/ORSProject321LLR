@@ -17,10 +17,13 @@ namespace ORSProjectModels
                 return;
             }
             model = _model;
-            model.CanonicalForm = CanonicalGenerator.GetInstance().GenerateCanonicalForm(model, Algorithm.DualSimplex);
+            if (model.CanonicalForm == null)
+            {
+                model.CanonicalForm = CanonicalGenerator.GenerateCanonicalForm(model, Algorithm.DualSimplex);
+            }
             double[][] table = model.CanonicalForm;
             Console.WriteLine(model.GenerateDisplayableCanonical());
-            do
+            while (CheckIfDoneWithDualPhase(table) == false)
             {
                 //Console.WriteLine("Running");
                 double[] rhsValues = GetRHSValues(table);
@@ -28,39 +31,14 @@ namespace ORSProjectModels
                 double[] zRow = table[0];
                 double[] pivotRowValues = GetPivotRowValues(table, pivotRowIndex);
                 int pivotColumnIndex = IdentifyPivotColumn(zRow, pivotRowValues);
-                //Console.WriteLine(pivotColumnIndex);
-                //Console.WriteLine(pivotRowIndex);
+                Console.WriteLine(pivotColumnIndex);
+                Console.WriteLine(pivotRowIndex);
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
-                Console.WriteLine(GenerateTableIteration(table));
-            } while (CheckIfDoneWithDualPhase(table) == false);
+                Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables, table));
+            }
             Model modelForSimplex = model;
             model.CanonicalForm = table;
             PrimalSimplex.Solve(modelForSimplex);
-        }
-
-        private static string GenerateTableIteration(double[][] table)
-        {
-            string displayable = "";
-            foreach (var item in model.DecisionVariables)
-            {
-                displayable += item + " ";
-            }
-            displayable += "\n";
-            foreach (var item in table)
-            {
-                foreach (var val in item)
-                {
-                    if (val < 0)
-                    {
-                        displayable += val + " ";
-                    } else
-                    {
-                        displayable += val + "  ";
-                    }
-                }
-                displayable += "\n";
-            }
-            return displayable;
         }
 
         private static double[] GetRHSValues(double[][] table)
@@ -89,13 +67,9 @@ namespace ORSProjectModels
         {
             int pivotColumnIndex = 0;
             List<double> ratios = new List<double>();
-            for (int i = 0; i < zRow.Length - 1; i++)
+            for (int i = 0; i < zRow.Length; i++)
             {
-                if (pivotRowValues[i] > 0)
-                {
-                    continue;
-                }
-                double ratio = CalculateRatio(pivotRowValues[i], pivotRowValues[i]);
+                double ratio = CalculateRatio(pivotRowValues[i], zRow[i]);
                 ratio = Util.AbsoluteValue(ratio);
                 ratios.Add(ratio);
             }

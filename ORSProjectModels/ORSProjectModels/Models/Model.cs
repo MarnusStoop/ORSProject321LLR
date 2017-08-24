@@ -12,7 +12,7 @@ namespace ORSProjectModels
         private double[] objectiveFunction;
         private List<Constraint> constraints;
         private List<SignRestriction> signRestrictions;
-        private double[][] canonicalForm;
+        private double[][] canonicalForm = null;
 
         public OptimizationType OptimizationType
         {

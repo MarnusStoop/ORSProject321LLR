@@ -11,7 +11,7 @@ namespace ORSProject
         static void Main(string[] args)
         {
             Model m = GenerateSampleModel();
-            PrimalSimplex.Solve(m);
+            DualSimplex.Solve(m);
             Console.ReadLine();
         }
 
@@ -19,7 +19,7 @@ namespace ORSProject
         {
             OptimizationType type = OptimizationType.Max;
             List<string> decVars = new List<string>(){ "x1", "x2" };
-            double[] objFunc = { 3,2 };
+            double[] objFunc = { 100,30 };
             List<Constraint> constraints = GenerateSampleConstraints();
             List<SignRestriction> restrictions = GenerateSampleSignRestrictions();
             return new Model(type, decVars, objFunc, constraints, restrictions);
@@ -27,9 +27,9 @@ namespace ORSProject
 
         static List<Constraint> GenerateSampleConstraints()
         {
-            Constraint con1 = new Constraint(new double[] { 2, 1 }, Sign.LessEqual, 100);
-            Constraint con2 = new Constraint(new double[] { 1, 1 }, Sign.LessEqual, 80);
-            Constraint con3 = new Constraint(new double[] { 1, 0 }, Sign.LessEqual, 40);
+            Constraint con1 = new Constraint(new double[] { 0, 1 }, Sign.GreaterEqual, 3);
+            Constraint con2 = new Constraint(new double[] { 1, 1 }, Sign.LessEqual, 7);
+            Constraint con3 = new Constraint(new double[] { 10, 4 }, Sign.LessEqual, 40);
             List<Constraint> constraints = new List<Constraint>();
             constraints.Add(con1);
             constraints.Add(con2);
