@@ -31,27 +31,7 @@ namespace ORSProjectModels
                 int pivotRowIndex = IdentifyPivotRow(columnValues, rhsValues);
                 //Console.WriteLine(pivotRowIndex);
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
-                string displayable = "";
-                foreach (var item in model.DecisionVariables)
-                {
-                    displayable += item + " ";
-                }
-                displayable += "\n";
-                foreach (var item in table)
-                {
-                    foreach (var val in item)
-                    {
-                        if (val < 0)
-                        {
-                            displayable += val + " ";
-                        } else
-                        {
-                            displayable += val + "  ";
-                        }
-                    }
-                    displayable += "\n";
-                }
-                Console.WriteLine(displayable);
+                Console.WriteLine(GenerateTableIteration(table));
             } while (CheckIfOptimal(table) == false);
             //while (CheckIfOptimal(table) == false)
             //{
@@ -65,6 +45,31 @@ namespace ORSProjectModels
             //    Console.WriteLine(pivotRowIndex);
             //    table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
             //}
+        }
+
+        private static string GenerateTableIteration(double[][] table)
+        {
+            string displayable = "";
+            foreach (var item in model.DecisionVariables)
+            {
+                displayable += item + " ";
+            }
+            displayable += "\n";
+            foreach (var item in table)
+            {
+                foreach (var val in item)
+                {
+                    if (val < 0)
+                    {
+                        displayable += val + " ";
+                    } else
+                    {
+                        displayable += val + "  ";
+                    }
+                }
+                displayable += "\n";
+            }
+            return displayable;
         }
 
         private static double[] GetRHSValues(double[][] table)

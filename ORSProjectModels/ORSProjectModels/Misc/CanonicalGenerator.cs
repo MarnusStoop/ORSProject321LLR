@@ -35,6 +35,16 @@ namespace ORSProjectModels
                     return GenerateTwoPhaseSimplexCanonical(model);
                 case Algorithm.DualSimplex:
                     return GenerateDualSimplexCanonical(model);
+                case Algorithm.RevisedPrimalSimplex:
+                    return GenerateRevisedSimplexCanonical(model);
+                case Algorithm.RevisedTwoPhaseSimplex:
+                    return GenerateRevisedTwoPhaseSimplexCanonical(model);
+                case Algorithm.RevisedDualSimplex:
+                    return GenerateRevisedDualSimplexCanonical(model);
+                case Algorithm.BranchAndBound:
+                    return GenerateBranchAndBoundCanonical(model);
+                case Algorithm.CuttingPlane:
+                    return GenerateCuttingPlaneCanonical(model);
                 default:
                     return null;
             }
@@ -163,8 +173,43 @@ namespace ORSProjectModels
             }
             int numberOfColumns = model.DecisionVariables.Count + 1;
             canonical = new double[numberOfRows + 1][];
+
             return canonical;
         }
 
+        private double[][] GenerateRevisedSimplexCanonical(Model model)
+        {
+            double[][] canonical = new double[2][];
+
+            return canonical;
+        }
+
+        private double[][] GenerateRevisedTwoPhaseSimplexCanonical(Model model)
+        {
+            double[][] canonical = new double[2][];
+
+            return canonical;
+        }
+
+        private double[][] GenerateRevisedDualSimplexCanonical(Model model)
+        {
+            double[][] canonical = new double[2][];
+
+            return canonical;
+        }
+
+        private double[][] GenerateBranchAndBoundCanonical(Model model)
+        {
+            double[][] canonical = new double[2][];
+
+            return canonical;
+        }
+
+        private double[][] GenerateCuttingPlaneCanonical(Model model)
+        {
+            double[][] canonical = new double[2][];
+
+            return canonical;
+        }
     }
 }

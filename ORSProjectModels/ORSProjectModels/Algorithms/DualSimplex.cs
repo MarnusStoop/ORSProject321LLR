@@ -7,5 +7,185 @@ namespace ORSProjectModels
 {
     public static class DualSimplex
     {
+
+        private static Model model;
+
+        public static void Solve(Model _model)
+        {
+            if (_model == null)
+            {
+                return;
+            }
+            model = _model;
+            model.CanonicalForm = CanonicalGenerator.GetInstance().GenerateCanonicalForm(model, Algorithm.DualSimplex);
+            double[][] table = model.CanonicalForm;
+            Console.WriteLine(model.GenerateDisplayableCanonical());
+            do
+            {
+                //Console.WriteLine("Running");
+                double[] rhsValues = GetRHSValues(table);
+                int pivotRowIndex = IdentifyPivotRow(rhsValues);
+                double[] zRow = table[0];
+                double[] pivotRowValues = GetPivotRowValues(table, pivotRowIndex);
+                int pivotColumnIndex = IdentifyPivotColumn(zRow, pivotRowValues);
+                //Console.WriteLine(pivotColumnIndex);
+                //Console.WriteLine(pivotRowIndex);
+                table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
+                Console.WriteLine(GenerateTableIteration(table));
+            } while (CheckIfDoneWithDualPhase(table) == false);
+            Model modelForSimplex = model;
+            model.CanonicalForm = table;
+            PrimalSimplex.Solve(modelForSimplex);
+        }
+
+        private static string GenerateTableIteration(double[][] table)
+        {
+            string displayable = "";
+            foreach (var item in model.DecisionVariables)
+            {
+                displayable += item + " ";
+            }
+            displayable += "\n";
+            foreach (var item in table)
+            {
+                foreach (var val in item)
+                {
+                    if (val < 0)
+                    {
+                        displayable += val + " ";
+                    } else
+                    {
+                        displayable += val + "  ";
+                    }
+                }
+                displayable += "\n";
+            }
+            return displayable;
+        }
+
+        private static double[] GetRHSValues(double[][] table)
+        {
+            List<double> rhs = new List<double>();
+            int rhsColumnIndex = table[0].Length - 1;
+            for (int i = 0; i < table.Length; i++)
+            {
+                rhs.Add(table[i][rhsColumnIndex]);
+            }
+            return rhs.ToArray();
+        }
+
+        private static double[] GetPivotColumnValues(double[][] table, int columnIndex)
+        {
+            List<double> column = new List<double>();
+            for (int i = 0; i < table.Length; i++)
+            {
+                double value = table[i][columnIndex];
+                column.Add(value);
+            }
+            return column.ToArray();
+        }
+
+        private static int IdentifyPivotColumn(double[] zRow, double[] pivotRowValues)
+        {
+            int pivotColumnIndex = 0;
+            List<double> ratios = new List<double>();
+            for (int i = 0; i < zRow.Length - 1; i++)
+            {
+                if (pivotRowValues[i] > 0)
+                {
+                    continue;
+                }
+                double ratio = CalculateRatio(pivotRowValues[i], pivotRowValues[i]);
+                ratio = Util.AbsoluteValue(ratio);
+                ratios.Add(ratio);
+            }
+            double smallestPositiveRatio = ratios.Min(x => x);
+            pivotColumnIndex = FindColumnIndex(ratios, smallestPositiveRatio);
+            return pivotColumnIndex;
+        }
+
+        private static double[] GetPivotRowValues(double[][] table, int pivotRowIndex)
+        {
+            return table[pivotRowIndex];
+        }
+
+        private static int FindColumnIndex(List<double> ratios, double number)
+        {
+            for (int i = 0; i < ratios.Count; i++)
+            {
+                if (ratios[i] == number)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        private static int IdentifyPivotRow(double[] rhsValues)
+        {
+            double largestNegativeRowValue = rhsValues.Where(x => x < 0).Min(x => x);
+            int rowIndex = FindRowIndex(rhsValues, largestNegativeRowValue);
+            return rowIndex;
+        }
+
+        private static int FindRowIndex(double[] rhsValues, double number)
+        {
+            for (int i = 0; i < rhsValues.Length; i++)
+            {
+                if (rhsValues[i] == number)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        private static double CalculateRatio(double columnValue, double zValue)
+        {
+            return zValue / columnValue;
+        }
+
+        private static bool CheckIfDoneWithDualPhase(double[][] table)
+        {
+            double[] rhsValues = GetRHSValues(table);
+            for (int i = 0; i < rhsValues.Length; i++)
+            {
+                if (rhsValues[i] < 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        //private static bool CheckIfOptimal(double[][] table)
+        //{
+        //    if (model.OptimizationType == OptimizationType.Min)
+        //    {
+        //        for (int i = 0; i < table[0].Length; i++)
+        //        {
+        //            if (table[0][i] > 0)
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //    } else
+        //    {
+        //        for (int i = 0; i < table[0].Length; i++)
+        //        {
+        //            if (table[0][i] < 0)
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //    }
+        //    return true;
+        //}
+
+        private static bool CheckIfInfeasible(double[][] table)
+        {
+            return false;
+        }
+
     }
 }

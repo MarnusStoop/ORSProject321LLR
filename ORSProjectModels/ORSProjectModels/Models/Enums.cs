@@ -30,7 +30,12 @@ namespace ORSProjectModels
     {
         PrimalSimplex,
         TwoPhaseSimplex,
-        DualSimplex
+        DualSimplex,
+        RevisedPrimalSimplex,
+        RevisedTwoPhaseSimplex,
+        RevisedDualSimplex,
+        BranchAndBound,
+        CuttingPlane
     }
 
     public enum RestrictionType
