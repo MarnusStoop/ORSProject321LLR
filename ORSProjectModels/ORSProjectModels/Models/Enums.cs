@@ -8,8 +8,6 @@ namespace ORSProjectModels
 
     public enum Sign
     {
-        Greater,
-        Less,
         Equal,
         GreaterEqual,
         LessEqual

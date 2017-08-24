@@ -8,13 +8,11 @@ namespace ORSProjectModels
     public class Model
     {
         private OptimizationType optimizationType;
-        private string[] decisionVariables;
+        private List<string> decisionVariables;
         private double[] objectiveFunction;
         private List<Constraint> constraints;
         private List<SignRestriction> signRestrictions;
         private double[][] canonicalForm;
-
-        private int numberOfConstraints = 0;
 
         public OptimizationType OptimizationType
         {
@@ -22,7 +20,7 @@ namespace ORSProjectModels
             set { optimizationType = value; }
         }
 
-        public string[] DecisionVariables
+        public List<string> DecisionVariables
         {
             get { return decisionVariables; }
             set { decisionVariables = value; }
@@ -57,62 +55,34 @@ namespace ORSProjectModels
 
         }
 
-        public Model(OptimizationType optimizationType, string[] decisionVariables, double[] objectiveFunction, List<Constraint> constraints, List<SignRestriction> signRestrictions)
+        public Model(OptimizationType optimizationType, List<string> decisionVariables, double[] objectiveFunction, List<Constraint> constraints, List<SignRestriction> signRestrictions)
         {
             this.OptimizationType = optimizationType;
             this.DecisionVariables = decisionVariables;
             this.ObjectiveFunction = objectiveFunction;
             this.Constraints = constraints;
             this.SignRestrictions = signRestrictions;
-            GenerateCanonicalForm();
-        }
-
-        private void GenerateCanonicalForm()
-        {
-            int numberOfRows = 0;
-            //Amount of decision variables plus 1 for rhs
-            //int numberOfColumns = decisionVariables.Length + 1;
-            foreach (var item in constraints)
-            {
-                numberOfRows++;
-                //numberOfColumns++;
-                if (item.Sign == Sign.Equal)
-                {
-                    numberOfRows++;
-                    //numberOfColumns++;
-                }
-            }
-            canonicalForm = new double[numberOfRows][];
-            //Assign objective
-            canonicalForm[0] = ConvertObjective();
-            canonicalForm[1] = ConvertObjective();
-            canonicalForm[2] = ConvertObjective();
-            canonicalForm[3] = ConvertObjective();
-        }
-
-        private double[] ConvertObjective()
-        {
-            double[] converted = objectiveFunction;
-            for (int i = 0; i < converted.Length; i++)
-            {
-                converted[i] *= -1;
-            }
-            return converted;
-        }
-
-        private void GenerateInitialTable()
-        {
-
         }
 
         public string GenerateDisplayableCanonical()
         {
             string displayable = "";
+            foreach (var item in decisionVariables)
+            {
+                displayable += item + " ";
+            }
+            displayable += "RHS\n";
             foreach (var item in canonicalForm)
             {
                 foreach (var val in item)
                 {
-                    displayable += val + " ";
+                    if (val < 0)
+                    {
+                        displayable += val + " ";
+                    } else
+                    {
+                        displayable += val + "  ";
+                    }
                 }
                 displayable += "\n";
             }

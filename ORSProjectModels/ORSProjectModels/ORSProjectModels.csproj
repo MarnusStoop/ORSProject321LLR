@@ -55,6 +55,7 @@
     <Compile Include="Algorithms\RevisedSimplex.cs" />
     <Compile Include="Algorithms\RevisedTwoPhaseSimplex.cs" />
     <Compile Include="Algorithms\TwoPhaseSimplex.cs" />
+    <Compile Include="Misc\CanonicalGenerator.cs" />
     <Compile Include="Misc\CommonFunctions.cs" />
     <Compile Include="Misc\Pivoting.cs" />
     <Compile Include="Misc\Util.cs" />

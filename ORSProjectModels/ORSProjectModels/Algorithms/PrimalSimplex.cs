@@ -7,5 +7,180 @@ namespace ORSProjectModels
 {
     public static class PrimalSimplex
     {
+
+        private static Model model;
+
+        public static void Solve(Model _model)
+        {
+            if (_model == null)
+            {
+                return;
+            }
+            model = _model;
+            model.CanonicalForm = CanonicalGenerator.GetInstance().GenerateCanonicalForm(model, Algorithm.PrimalSimplex);
+            double[][] table = model.CanonicalForm;
+            Console.WriteLine(model.GenerateDisplayableCanonical());
+            do
+            {
+                //Console.WriteLine("Running");
+                double[] zRow = table[0];
+                int pivotColumnIndex = IdentifyPivotColumn(zRow);
+                //Console.WriteLine(pivotColumnIndex);
+                double[] rhsValues = GetRHSValues(table);
+                double[] columnValues = GetPivotColumnValues(table, pivotColumnIndex);
+                int pivotRowIndex = IdentifyPivotRow(columnValues, rhsValues);
+                //Console.WriteLine(pivotRowIndex);
+                table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
+                string displayable = "";
+                foreach (var item in model.DecisionVariables)
+                {
+                    displayable += item + " ";
+                }
+                displayable += "\n";
+                foreach (var item in table)
+                {
+                    foreach (var val in item)
+                    {
+                        if (val < 0)
+                        {
+                            displayable += val + " ";
+                        } else
+                        {
+                            displayable += val + "  ";
+                        }
+                    }
+                    displayable += "\n";
+                }
+                Console.WriteLine(displayable);
+            } while (CheckIfOptimal(table) == false);
+            //while (CheckIfOptimal(table) == false)
+            //{
+            //    Console.WriteLine("Running");
+            //    double[] zRow = table[0];
+            //    int pivotColumnIndex = IdentifyPivotColumn(zRow);
+            //    Console.WriteLine(pivotColumnIndex);
+            //    double[] rhsValues = table[table.Length - 1];
+            //    double[] columnValues = GetPivotColumnValues(table, pivotColumnIndex);
+            //    int pivotRowIndex = IdentifyPivotRow(columnValues, rhsValues);
+            //    Console.WriteLine(pivotRowIndex);
+            //    table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
+            //}
+        }
+
+        private static double[] GetRHSValues(double[][] table)
+        {
+            List<double> rhs = new List<double>();
+            int rhsColumnIndex = table[0].Length - 1;
+            for (int i = 0; i < table.Length; i++)
+            {
+                rhs.Add(table[i][rhsColumnIndex]);
+            }
+            return rhs.ToArray();
+        }
+
+        private static double[] GetPivotColumnValues(double[][] table, int columnIndex)
+        {
+            List<double> column = new List<double>();
+            for (int i = 0; i < table.Length; i++)
+            {
+                double value = table[i][columnIndex];
+                column.Add(value);
+            }
+            return column.ToArray();
+        }
+
+        private static int IdentifyPivotColumn(double[] zRow)
+        {
+            int pivotColumnIndex = 0;
+            if (model.OptimizationType == OptimizationType.Min)
+            {
+                double lowestPositive = zRow.Where(x => x > 0).Max(x => x);
+                pivotColumnIndex = FindColumnIndex(zRow, lowestPositive);
+            } else
+            {
+                double highestNegative = zRow.Where(x => x < 0).Min(x => x);
+                pivotColumnIndex = FindColumnIndex(zRow, highestNegative);
+            }
+            return pivotColumnIndex;
+        }
+
+        private static int FindColumnIndex(double[] row, double number)
+        {
+            for (int i = 0; i < row.Length; i++)
+            {
+                if (row[i] == number)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        private static int IdentifyPivotRow(double[] pivotColumn, double[] rhsValues)
+        {
+            List<double> ratios = new List<double>();
+            for (int i = 0; i < rhsValues.Length; i++)
+            {
+                double ratio = CalculateRatio(pivotColumn[i], rhsValues[i]);
+                ratios.Add(ratio);
+            }
+            double lowestRatio = ratios.Where(x => x > 0).Min(x => x);
+            int rowIndex = FindRowIndex(ratios, lowestRatio);
+            return rowIndex;
+        }
+
+        private static int FindRowIndex(List<double> ratios, double number)
+        {
+            for (int i = 0; i < ratios.Count; i++)
+            {
+                if (ratios[i] == number)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        private static double CalculateRatio(double columnValue, double rhsValue)
+        {
+            return rhsValue / columnValue;
+        }
+
+        private static bool CheckIfOptimal(double[][] table)
+        {
+            if (model.OptimizationType == OptimizationType.Min)
+            {
+                for (int i = 0; i < table[0].Length; i++)
+                {
+                    if (table[0][i] > 0)
+                    {
+                        return false;
+                    }
+                }
+            } else
+            {
+                for (int i = 0; i < table[0].Length; i++)
+                {
+                    if (table[0][i] < 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private static bool CheckIfInfeasible(double[][] table)
+        {
+            if (model.OptimizationType == OptimizationType.Max)
+            {
+
+            } else
+            {
+
+            }
+            return false;
+        }
+
     }
 }
