@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ORSProjectModels;
+using System.Windows.Forms;
 
 namespace ORSProject
 {
     class Program
     {
+
+        static OpenFileDialog ofd = new OpenFileDialog();
+
         static void Main(string[] args)
         {
             Model m = GenerateSampleModel();
@@ -15,6 +19,26 @@ namespace ORSProject
             Console.ReadLine();
         }
 
+        #region Display
+
+        private static void DisplayMainMenu()
+        {
+
+        }
+
+        #endregion
+
+        #region File input
+
+        static Model GenerateModelFromFile(List<string> data)
+        {
+
+            return new Model();
+        }
+
+        #endregion
+
+        #region Sample Models
         static Model GenerateSampleModel()
         {
             OptimizationType type = OptimizationType.Max;
@@ -46,6 +70,6 @@ namespace ORSProject
             restrictions.Add(res2);
             return restrictions;
         }
-
+        #endregion
     }
 }

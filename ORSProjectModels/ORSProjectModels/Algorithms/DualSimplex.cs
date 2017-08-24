@@ -31,8 +31,8 @@ namespace ORSProjectModels
                 double[] zRow = table[0];
                 double[] pivotRowValues = GetPivotRowValues(table, pivotRowIndex);
                 int pivotColumnIndex = IdentifyPivotColumn(zRow, pivotRowValues);
-                Console.WriteLine(pivotColumnIndex);
-                Console.WriteLine(pivotRowIndex);
+                //Console.WriteLine(pivotColumnIndex);
+                //Console.WriteLine(pivotRowIndex);
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
                 Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables, table));
             }
@@ -71,9 +71,13 @@ namespace ORSProjectModels
             {
                 double ratio = CalculateRatio(pivotRowValues[i], zRow[i]);
                 ratio = Util.AbsoluteValue(ratio);
+                if (pivotRowValues[i] > 0)
+                {
+                    ratio *= -1;
+                }
                 ratios.Add(ratio);
             }
-            double smallestPositiveRatio = ratios.Min(x => x);
+            double smallestPositiveRatio = ratios.Where(x => x > 0).Min(x => x);
             pivotColumnIndex = FindColumnIndex(ratios, smallestPositiveRatio);
             return pivotColumnIndex;
         }
