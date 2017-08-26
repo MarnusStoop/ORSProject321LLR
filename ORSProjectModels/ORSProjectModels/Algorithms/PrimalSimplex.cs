@@ -63,7 +63,7 @@ namespace ORSProjectModels
         private static int IdentifyPivotColumn(double[] zRow)
         {
             int pivotColumnIndex = 0;
-            if (model.OptimizationType == OptimizationType.Min)
+            if (model.OptimizationType == OptimizationType.min)
             {
                 double lowestPositive = zRow.Where(x => x > 0).Max(x => x);
                 pivotColumnIndex = FindColumnIndex(zRow, lowestPositive);
@@ -119,7 +119,7 @@ namespace ORSProjectModels
 
         private static bool CheckIfOptimal(double[][] table)
         {
-            if (model.OptimizationType == OptimizationType.Min)
+            if (model.OptimizationType == OptimizationType.min)
             {
                 for (int i = 0; i < table[0].Length; i++)
                 {
@@ -143,7 +143,7 @@ namespace ORSProjectModels
 
         private static bool CheckIfInfeasible(double[][] table)
         {
-            if (model.OptimizationType == OptimizationType.Max)
+            if (model.OptimizationType == OptimizationType.max)
             {
 
             } else

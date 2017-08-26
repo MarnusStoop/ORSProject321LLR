@@ -8,7 +8,6 @@ namespace ORSProjectModels
     public class SignRestriction
     {
         private string decisionVariable;
-        private Positivity positivity;
         private RestrictionType restrictionType;
 
         public RestrictionType RestrictionType
@@ -23,21 +22,14 @@ namespace ORSProjectModels
             set { decisionVariable = value; }
         }
 
-        public Positivity Positivity
-        {
-            get { return positivity; }
-            set { positivity = value; }
-        }
-
         public SignRestriction()
         {
 
         }
 
-        public SignRestriction(string decisionVariable, Positivity positivity, RestrictionType restrictionType)
+        public SignRestriction(string decisionVariable, RestrictionType restrictionType)
         {
             this.DecisionVariable = decisionVariable;
-            this.Positivity = positivity;
             this.RestrictionType = restrictionType;
         }
 

@@ -13,17 +13,10 @@ namespace ORSProjectModels
         LessEqual
     }
 
-    public enum Positivity
-    {
-        Positive,
-        Negative,
-        Unrestricted
-    }
-
     public enum OptimizationType
     {
-        Max,
-        Min
+        max,
+        min
     }
 
     public enum Algorithm
@@ -42,6 +35,8 @@ namespace ORSProjectModels
     {
         Integer,
         Binary,
-        Decimal
+        Positive,
+        Negative,
+        Unrestricted
     }
 }

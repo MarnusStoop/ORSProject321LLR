@@ -49,11 +49,11 @@
     <Compile Include="Algorithms\BranchAndBound.cs" />
     <Compile Include="Algorithms\CuttingPlane.cs" />
     <Compile Include="Algorithms\DualSimplex.cs" />
-    <Compile Include="Algorithms\MathematicalPreliminaries.cs" />
     <Compile Include="Algorithms\PrimalSimplex.cs" />
     <Compile Include="Algorithms\RevisedDualSimplex.cs" />
     <Compile Include="Algorithms\RevisedSimplex.cs" />
     <Compile Include="Algorithms\RevisedTwoPhaseSimplex.cs" />
+    <Compile Include="Algorithms\SensitivityAnalysis.cs" />
     <Compile Include="Algorithms\TwoPhaseSimplex.cs" />
     <Compile Include="Misc\AnswerGenerator.cs" />
     <Compile Include="Misc\CanonicalGenerator.cs" />

@@ -30,6 +30,10 @@ namespace ORSProjectModels
                 int pivotRowIndex = IdentifyPivotRow(rhsValues);
                 double[] zRow = table[0];
                 double[] pivotRowValues = GetPivotRowValues(table, pivotRowIndex);
+                if (CheckIfInfeasible(pivotRowValues))
+                {
+                    return;
+                }
                 int pivotColumnIndex = IdentifyPivotColumn(zRow, pivotRowValues);
                 //Console.WriteLine(pivotColumnIndex);
                 //Console.WriteLine(pivotRowIndex);
@@ -136,33 +140,17 @@ namespace ORSProjectModels
             return true;
         }
 
-        //private static bool CheckIfOptimal(double[][] table)
-        //{
-        //    if (model.OptimizationType == OptimizationType.Min)
-        //    {
-        //        for (int i = 0; i < table[0].Length; i++)
-        //        {
-        //            if (table[0][i] > 0)
-        //            {
-        //                return false;
-        //            }
-        //        }
-        //    } else
-        //    {
-        //        for (int i = 0; i < table[0].Length; i++)
-        //        {
-        //            if (table[0][i] < 0)
-        //            {
-        //                return false;
-        //            }
-        //        }
-        //    }
-        //    return true;
-        //}
-
-        private static bool CheckIfInfeasible(double[][] table)
+        private static bool CheckIfInfeasible(double[] pivotRow)
         {
-            return false;
+            //-1 to ignore rhs value
+            for (int i = 0; i < pivotRow.Length - 1; i++)
+            {
+                if (pivotRow[i] < 0)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
     }
