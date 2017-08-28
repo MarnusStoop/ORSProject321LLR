@@ -10,11 +10,11 @@ namespace ORSProjectModels
 
         private static Model model;
 
-        public static void Solve(Model _model)
+        public static double[][] Solve(Model _model)
         {
             if (_model == null)
             {
-                return;
+                return null;
             }
             model = _model;
             if (model.CanonicalForm == null)
@@ -32,7 +32,7 @@ namespace ORSProjectModels
                 double[] pivotRowValues = GetPivotRowValues(table, pivotRowIndex);
                 if (CheckIfInfeasible(pivotRowValues))
                 {
-                    return;
+                    return null;
                 }
                 int pivotColumnIndex = IdentifyPivotColumn(zRow, pivotRowValues);
                 //Console.WriteLine(pivotColumnIndex);
@@ -42,7 +42,7 @@ namespace ORSProjectModels
             }
             Model modelForSimplex = model;
             model.CanonicalForm = table;
-            PrimalSimplex.Solve(modelForSimplex);
+            return PrimalSimplex.Solve(modelForSimplex);
         }
 
         private static double[] GetRHSValues(double[][] table)

@@ -10,11 +10,11 @@ namespace ORSProjectModels
 
         private static Model model;
 
-        public static void Solve(Model _model)
+        public static double[][] Solve(Model _model)
         {
             if (_model == null)
             {
-                return;
+                return null;
             }
             model = _model;
             if (model.CanonicalForm == null)
@@ -36,6 +36,7 @@ namespace ORSProjectModels
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
                 Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables,table));
             }
+            return table;
         }
 
         private static double[] GetRHSValues(double[][] table)
@@ -143,6 +144,7 @@ namespace ORSProjectModels
 
         private static bool CheckIfInfeasible(double[][] table)
         {
+            //to be done
             if (model.OptimizationType == OptimizationType.max)
             {
 

@@ -127,8 +127,156 @@ namespace ORSProjectModels
 
         private static double[][] GenerateTwoPhaseSimplexCanonical(Model model)
         {
-            double[][] canonical = new double[2][];
+            double[][] canonical;
+            int numberOfRows = 0;
 
+            for (int i = 0; i < model.Constraints.Count; i++)
+            {
+                numberOfRows++;
+                switch (model.Constraints[i].Sign)
+                {
+                    case Sign.Equal:
+                        AddSlackVariable(i);
+                        AddExcessVariable(i);
+                        AddArtificalVariable(i);
+                        break;
+                    case Sign.GreaterEqual:
+                        AddExcessVariable(i);
+                        AddArtificalVariable(i);
+                        break;
+                    case Sign.LessEqual:
+                        AddSlackVariable(i);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            int numberOfColumns = model.DecisionVariables.Count + 1;
+            canonical = new double[numberOfRows + 2][];
+            //Assign objective
+            for (int i = 0; i < model.Constraints.Count; i++)
+            {
+                List<double> slacks = new List<double>();
+                List<double> excess = new List<double>();
+                List<double> artifical = new List<double>();
+                foreach (var item in model.DecisionVariables)
+                {
+                    if (item.Contains("s"))
+                    {
+                        if (item == "s" + (i + 1))
+                        {
+                            slacks.Add(1);
+                        } else
+                        {
+                            slacks.Add(0);
+                        }
+                    } else if (item.Contains("e"))
+                    {
+                        if (item == "e" + (i + 1))
+                        {
+                            excess.Add(-1);
+                        } else
+                        {
+                            excess.Add(0);
+                        }
+                    } else if (item.Contains("a"))
+                    {
+                        if (item == "a" + (i + 1))
+                        {
+                            artifical.Add(1);
+                        } else
+                        {
+                            artifical.Add(0);
+                        }
+                    }
+                }
+                double[] additionalVariables = slacks.Concat(excess).Concat(artifical).ToArray();
+                canonical[i + 2] = model.Constraints[i].Coefficients.Concat(additionalVariables).Concat(new double[] { model.Constraints[i].RHS }).ToArray();
+            }
+            canonical[0] = GenerateWRow();
+            canonical[1] = ConvertObjective();
+            return canonical;
+        }
+
+        private static double[] GenerateWRow()
+        {
+            List<double> converted = new List<double>();
+            converted.AddRange(model.ObjectiveFunction);
+            int numberOfSEVariables = (from dv in model.DecisionVariables
+                                       where dv.Contains("s") || dv.Contains("e")
+                                       select dv).Count();
+            for (int i = 0; i < numberOfSEVariables; i++)
+            {
+                converted.Add(0);
+            }
+            converted.Add(0);
+            return converted.ToArray();
+        }
+
+        private static void AddArtificalVariable(int index)
+        {
+            model.DecisionVariables.Add("a" + (index + 1));
+        }
+
+        private static double[][] GenerateSecondPhaseForTwoPhaseCanonical(Model model)
+        {
+            double[][] canonical;
+            int numberOfRows = 0;
+
+            for (int i = 0; i < model.Constraints.Count; i++)
+            {
+                numberOfRows++;
+                switch (model.Constraints[i].Sign)
+                {
+                    case Sign.Equal:
+                        AddSlackVariable(i);
+                        AddExcessVariable(i);
+                        AddArtificalVariable(i);
+                        break;
+                    case Sign.GreaterEqual:
+                        AddExcessVariable(i);
+                        AddArtificalVariable(i);
+                        break;
+                    case Sign.LessEqual:
+                        AddSlackVariable(i);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            int numberOfColumns = model.DecisionVariables.Count + 1;
+            canonical = new double[numberOfRows + 1][];
+            //Assign objective
+            canonical[0] = ConvertObjective();
+            for (int i = 0; i < model.Constraints.Count; i++)
+            {
+                List<double> slacks = new List<double>();
+                List<double> excess = new List<double>();
+                foreach (var item in model.DecisionVariables)
+                {
+                    if (item.Contains("s"))
+                    {
+                        if (item == "s" + (i + 1))
+                        {
+                            slacks.Add(1);
+                        } else
+                        {
+                            slacks.Add(0);
+                        }
+                    } else if (item.Contains("e"))
+                    {
+                        if (item == "e" + (i + 1))
+                        {
+                            excess.Add(-1);
+                        } else
+                        {
+                            excess.Add(0);
+                        }
+                    }
+                }
+                double[] additionalVariables = slacks.Concat(excess).ToArray();
+                canonical[i + 1] = model.Constraints[i].Coefficients.Concat(additionalVariables).Concat(new double[] { model.Constraints[i].RHS }).ToArray();
+            }
             return canonical;
         }
 
