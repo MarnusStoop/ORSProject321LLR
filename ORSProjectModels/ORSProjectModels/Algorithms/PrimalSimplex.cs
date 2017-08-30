@@ -10,7 +10,7 @@ namespace ORSProjectModels
 
         private static Model model;
 
-        public static double[][] Solve(Model _model)
+        public static Answer Solve(Model _model)
         {
             if (_model == null)
             {
@@ -22,6 +22,10 @@ namespace ORSProjectModels
                 model.CanonicalForm = CanonicalGenerator.GenerateCanonicalForm(model, Algorithm.PrimalSimplex);
             }
             double[][] table = model.CanonicalForm;
+            //if (GetRHSValues(table).Where(x => x < 0).Count() > 0)
+            //{
+            //    return AnswerGenerator.GenerateInfeasibleAnswer(InfeasiblityReason.UnsolvableWithAlgorithm);
+            //}
             Console.WriteLine(model.GenerateDisplayableCanonical());
             while (CheckIfOptimal(table) == false)
             {
@@ -34,9 +38,9 @@ namespace ORSProjectModels
                 int pivotRowIndex = IdentifyPivotRow(columnValues, rhsValues);
                 //Console.WriteLine(pivotRowIndex);
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
-                Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables,table));
+                Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables, table));
             }
-            return table;
+            return AnswerGenerator.GenerateAnswer(table, model.DecisionVariables);
         }
 
         private static double[] GetRHSValues(double[][] table)
@@ -122,7 +126,7 @@ namespace ORSProjectModels
         {
             if (model.OptimizationType == OptimizationType.min)
             {
-                for (int i = 0; i < table[0].Length; i++)
+                for (int i = 0; i < table[0].Length - 1; i++)
                 {
                     if (table[0][i] > 0)
                     {
@@ -131,7 +135,7 @@ namespace ORSProjectModels
                 }
             } else
             {
-                for (int i = 0; i < table[0].Length; i++)
+                for (int i = 0; i < table[0].Length - 1; i++)
                 {
                     if (table[0][i] < 0)
                     {

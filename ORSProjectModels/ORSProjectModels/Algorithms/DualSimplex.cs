@@ -10,7 +10,7 @@ namespace ORSProjectModels
 
         private static Model model;
 
-        public static double[][] Solve(Model _model)
+        public static Answer Solve(Model _model)
         {
             if (_model == null)
             {
@@ -32,7 +32,7 @@ namespace ORSProjectModels
                 double[] pivotRowValues = GetPivotRowValues(table, pivotRowIndex);
                 if (CheckIfInfeasible(pivotRowValues))
                 {
-                    return null;
+                    return AnswerGenerator.GenerateInfeasibleAnswer(InfeasiblityReason.GeneralUnsolvability);
                 }
                 int pivotColumnIndex = IdentifyPivotColumn(zRow, pivotRowValues);
                 //Console.WriteLine(pivotColumnIndex);
@@ -59,7 +59,7 @@ namespace ORSProjectModels
         private static double[] GetPivotColumnValues(double[][] table, int columnIndex)
         {
             List<double> column = new List<double>();
-            for (int i = 0; i < table.Length; i++)
+            for (int i = 0; i < table.Length - 1; i++)
             {
                 double value = table[i][columnIndex];
                 column.Add(value);
@@ -71,7 +71,7 @@ namespace ORSProjectModels
         {
             int pivotColumnIndex = 0;
             List<double> ratios = new List<double>();
-            for (int i = 0; i < zRow.Length; i++)
+            for (int i = 0; i < zRow.Length - 1; i++)
             {
                 double ratio = CalculateRatio(pivotRowValues[i], zRow[i]);
                 ratio = Util.AbsoluteValue(ratio);

@@ -60,6 +60,7 @@
     <Compile Include="Misc\CommonFunctions.cs" />
     <Compile Include="Misc\Pivoting.cs" />
     <Compile Include="Misc\Util.cs" />
+    <Compile Include="Models\Answer.cs" />
     <Compile Include="Models\Constraint.cs" />
     <Compile Include="Models\Enums.cs" />
     <Compile Include="Data Handlers\FileHandler.cs" />

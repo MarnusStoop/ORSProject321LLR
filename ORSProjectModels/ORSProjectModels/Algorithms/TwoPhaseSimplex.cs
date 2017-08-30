@@ -10,7 +10,7 @@ namespace ORSProjectModels
 
         private static Model model;
 
-        public static double[][] Solve(Model _model)
+        public static Answer Solve(Model _model)
         {
             if (_model == null)
             {

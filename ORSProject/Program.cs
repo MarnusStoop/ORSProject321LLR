@@ -11,28 +11,156 @@ namespace ORSProject
     {
 
         static OpenFileDialog ofd = new OpenFileDialog();
+        static Model loadedModel;
+
+        static bool isRunning = true;
 
         [STAThread]
         static void Main(string[] args)
         {
             ofd.Filter = "Text Files|*.txt";
             ofd.InitialDirectory = "Problem Files";
-            if (ofd.ShowDialog() == DialogResult.OK)
+            ofd.Title = "Select a model file";
+            LoadModel();
+            while (isRunning)
             {
-                List<string> data = FileHandler.Read(ofd.FileName);
-                Model mm = GenerateModelFromFile(data);
-                DualSimplex.Solve(mm);
+                Console.Clear();
+                DisplayMainMenu();
             }
-            //Model m = GenerateSampleModel();
-            //DualSimplex.Solve(m);
-            Console.ReadLine();
         }
 
         #region Display
 
         private static void DisplayMainMenu()
         {
+            Console.WriteLine("Please select an option");
+            Console.WriteLine("1. Solve with Primal Simplex");
+            Console.WriteLine("2. Solve with Two-phase Simplex");
+            Console.WriteLine("3. Solve with Dual Simplex");
+            Console.WriteLine("4. Solve with Revised Primal Simplex");
+            Console.WriteLine("5. Solve with Revised Two-phase Simplex");
+            Console.WriteLine("6. Solve with Revised Dual Simplex");
+            Console.WriteLine("7. Solve with Branch and bound");
+            Console.WriteLine("8. Solve with Cutting plane");
+            Console.WriteLine("9. Load a different model");
+            Console.WriteLine("10. Exit");
+            ProcessMainMenuInput();
+        }
 
+        private static void ProcessMainMenuInput()
+        {
+            int optionSelected;
+            if (!int.TryParse(Console.ReadLine(), out optionSelected))
+            {
+                Console.WriteLine("Please enter a number");
+            }
+            Console.Clear();
+            switch ((MainMenuOption)optionSelected)
+            {
+                case MainMenuOption.SolvePrimal:
+                    SolveWithPrimalSimplex();
+                    break;
+                case MainMenuOption.SolveTwoPhase:
+                    SolveWithTwoPhaseSimplex();
+                    break;
+                case MainMenuOption.SolveDual:
+                    SolveWithDualSimplex();
+                    break;
+                case MainMenuOption.SolveRevisedPrimal:
+                    SolveWithRevisedPrimalSimplex();
+                    break;
+                case MainMenuOption.SolveRevisedTwoPhase:
+                    SolveWithRevisedTwoPhaseSimplex();
+                    break;
+                case MainMenuOption.SolveRevisedDual:
+                    SolveWithRevisedDualSimplex();
+                    break;
+                case MainMenuOption.SolveBranchAndBound:
+                    SolveWithBranchAndBound();
+                    break;
+                case MainMenuOption.SolveCuttingPlane:
+                    SolveWithCuttingPlane();
+                    break;
+                case MainMenuOption.LoadModel:
+                    LoadModel();
+                    break;
+                case MainMenuOption.Exit:
+                    Exit();
+                    break;
+                default:
+                    Console.WriteLine("Please enter a listed option");
+                    break;
+            }
+        }
+
+        private static void SolveWithPrimalSimplex()
+        {
+            Answer answer = PrimalSimplex.Solve(loadedModel);
+            DisplayAnswer(answer);
+        }
+
+        private static void SolveWithTwoPhaseSimplex()
+        {
+            Answer answer = TwoPhaseSimplex.Solve(loadedModel);
+            DisplayAnswer(answer);
+        }
+
+        private static void SolveWithDualSimplex()
+        {
+            Answer answer = DualSimplex.Solve(loadedModel);
+            DisplayAnswer(answer);
+        }
+
+        private static void SolveWithRevisedPrimalSimplex()
+        {
+
+        }
+
+        private static void SolveWithRevisedTwoPhaseSimplex()
+        {
+
+        }
+
+        private static void SolveWithRevisedDualSimplex()
+        {
+
+        }
+
+        private static void SolveWithBranchAndBound()
+        {
+
+        }
+
+        private static void SolveWithCuttingPlane()
+        {
+
+        }
+
+        private static void LoadModel()
+        {
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                List<string> data = FileHandler.Read(ofd.FileName);
+                loadedModel = GenerateModelFromFile(data);
+            }
+        }
+
+        private static void Exit()
+        {
+            isRunning = false;
+        }
+
+        private static void DisplayAnswer(Answer answer)
+        {
+            if (answer.Infeasibility != null)
+            {
+                Console.WriteLine(answer.Infeasibility);
+                Console.ReadLine();
+            } else
+            {
+                Console.WriteLine(answer.ToString());
+                Console.ReadLine();
+            }
         }
 
         #endregion

@@ -39,4 +39,29 @@ namespace ORSProjectModels
         Negative,
         Unrestricted
     }
+
+    public enum InfeasiblityReason
+    {
+        UnsolvableWithAlgorithm,
+        GeneralUnsolvability
+    }
+
+    public enum MainMenuOption
+    {
+        SolvePrimal = 1,
+        SolveTwoPhase,
+        SolveDual,
+        SolveRevisedPrimal,
+        SolveRevisedTwoPhase,
+        SolveRevisedDual,
+        SolveBranchAndBound,
+        SolveCuttingPlane,
+        LoadModel,
+        Exit
+    }
+
+    public enum SensitivityAnalysisOption
+    {
+
+    }
 }
