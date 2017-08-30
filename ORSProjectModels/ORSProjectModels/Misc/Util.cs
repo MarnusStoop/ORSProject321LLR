@@ -70,5 +70,20 @@ namespace ORSProjectModels
         {
             return GetIntegerPart(number);
         }
+
+        public static double[][] CheckForSmallValues(double[][] table)
+        {
+            for (int i = 0; i < table.Length; i++)
+            {
+                for (int j = 0; j < table[i].Length; j++)
+                {
+                    if (table[i][j] <= double.Epsilon && table[i][j] > 0)
+                    {
+                        table[i][j] = 0;
+                    }
+                }
+            }
+            return table;
+        }
     }
 }

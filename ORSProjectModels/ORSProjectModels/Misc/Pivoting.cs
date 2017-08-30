@@ -11,6 +11,7 @@ namespace ORSProjectModels
         public static double[][] PivotTable(double[][] table, int pivotColumnIndex, int pivotRowIndex)
         {
             double[][] newTable = table;
+            newTable = Util.CheckForSmallValues(newTable);
             double crossSectionValue = table[pivotRowIndex][pivotColumnIndex];
             for (int i = 0; i < newTable[pivotRowIndex].Length; i++)
             {

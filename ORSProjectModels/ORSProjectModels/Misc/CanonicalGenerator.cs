@@ -323,26 +323,30 @@ namespace ORSProjectModels
             model.DecisionVariables.Add("a" + (index + 1));
         }
 
-        public static double[][] GenerateSecondPhaseForTwoPhaseCanonical(Model model, double[][] endOfPhase1Table)
+        public static double[][] GenerateSecondPhaseForTwoPhaseCanonical(Model _model, double[][] endOfPhase1Table, out Model modelForSimplex)
         {
+            model = _model;
             double[][] canonical = endOfPhase1Table;
-            List<int> decisionVariableIndices = FindDecisionVariableIndices(model.DecisionVariables);
-            List<int> slackVariableIndices = FindSlackVariableIndices(model.DecisionVariables);
-            List<int> excessVariableIndices = FindExcessVariableIndices(model.DecisionVariables);
-            List<int> artificalVariableIndices = FindArtificialVariableIndices(model.DecisionVariables);
+            List<int> decisionVariableIndices = FindDecisionVariableIndices(_model.DecisionVariables);
+            List<int> slackVariableIndices = FindSlackVariableIndices(_model.DecisionVariables);
+            List<int> excessVariableIndices = FindExcessVariableIndices(_model.DecisionVariables);
+            List<int> artificalVariableIndices = FindArtificialVariableIndices(_model.DecisionVariables);
             List<int> basicArtificalVariableIndices = FindBasicArtificialVariableIndices(endOfPhase1Table, artificalVariableIndices);
+            for (int i = 0; i < artificalVariableIndices.Count; i++)
+            {
+                if (!basicArtificalVariableIndices.Contains(artificalVariableIndices[i]))
+                {
+                    model.DecisionVariables.RemoveAt(i);
+                }
+            }
             int numberOfColumns = (decisionVariableIndices.Count + slackVariableIndices.Count + excessVariableIndices.Count + basicArtificalVariableIndices.Count) + 1;
             double[][] newCanonical = new double[canonical.Length - 1][];
-            List<int> indicesToCopy = (List<int>)decisionVariableIndices.Concat(slackVariableIndices).Concat(excessVariableIndices).Concat(basicArtificalVariableIndices);
-            int rhsIndex = canonical[0].Length - 1;
+            List<int> indicesToCopy = (decisionVariableIndices.Concat(slackVariableIndices).Concat(excessVariableIndices).Concat(basicArtificalVariableIndices)).ToList();
             for (int i = 1; i < canonical.Length; i++)
             {
-                for (int j = 0; j < indicesToCopy.Count; j++)
-                {
-                    newCanonical[i - 1][j] = canonical[i][indicesToCopy[j]];
-                }
-                newCanonical[i - 1][numberOfColumns - 1] = canonical[i][rhsIndex];
+                newCanonical[i - 1] = CopyValues(canonical, i, indicesToCopy);
             }
+            modelForSimplex = model;
             return newCanonical;
         }
 
@@ -358,6 +362,21 @@ namespace ORSProjectModels
                 }
             }
             return indices;
+        }
+
+        private static double[] CopyValues(double[][] canonical, int currentRow, List<int> indicesToCopy)
+        {
+            //List<double> values = new List<double>();
+            double[] valuesA = new double[indicesToCopy.Count];
+            int rhsIndex = canonical[0].Length - 1;
+            for (int j = 0; j < indicesToCopy.Count; j++)
+            {
+                double copiedValue = canonical[currentRow][indicesToCopy[j]];
+                valuesA[indicesToCopy[j]] = copiedValue;
+            }
+            double rhsValue = canonical[currentRow][rhsIndex];
+            valuesA[valuesA.Length - 1] = rhsValue;
+            return valuesA;
         }
 
         private static double[] GetColumnValues(double[][] table, int columnIndex)

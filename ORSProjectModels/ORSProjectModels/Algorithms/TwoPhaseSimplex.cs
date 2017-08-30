@@ -28,16 +28,17 @@ namespace ORSProjectModels
                 //Console.WriteLine("Running");
                 double[] zRow = table[0];
                 int pivotColumnIndex = IdentifyPivotColumn(zRow);
-                //Console.WriteLine(pivotColumnIndex);
+                Console.WriteLine(pivotColumnIndex);
                 double[] rhsValues = GetRHSValues(table);
                 double[] columnValues = GetPivotColumnValues(table, pivotColumnIndex);
                 int pivotRowIndex = IdentifyPivotRow(columnValues, rhsValues);
-                //Console.WriteLine(pivotRowIndex);
+                Console.WriteLine(pivotRowIndex);
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
                 Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables, table));
             }
-            Model modelForSimplex = model;
-            modelForSimplex.CanonicalForm = CanonicalGenerator.GenerateSecondPhaseForTwoPhaseCanonical(modelForSimplex, table);
+            Model modelForSimplex;
+            double[][] newCanonical = CanonicalGenerator.GenerateSecondPhaseForTwoPhaseCanonical(model, table, out modelForSimplex);
+            modelForSimplex.CanonicalForm = newCanonical;
             return PrimalSimplex.Solve(modelForSimplex);
         }
 
@@ -66,8 +67,13 @@ namespace ORSProjectModels
         private static int IdentifyPivotColumn(double[] zRow)
         {
             int pivotColumnIndex = 0;
-            double lowestPositive = zRow.Where(x => x > 0).Max(x => x);
-            pivotColumnIndex = FindColumnIndex(zRow, lowestPositive);
+            double[] values = new double[zRow.Length - 1];
+            for (int i = 0; i < zRow.Length - 1; i++)
+            {
+                values[i] = zRow[i];
+            }
+            double largestPositive = values.Where(x => x > 0).Max(x => x);
+            pivotColumnIndex = FindColumnIndex(values, largestPositive);
             return pivotColumnIndex;
         }
 
@@ -86,7 +92,9 @@ namespace ORSProjectModels
         private static int IdentifyPivotRow(double[] pivotColumn, double[] rhsValues)
         {
             List<double> ratios = new List<double>();
-            for (int i = 0; i < rhsValues.Length; i++)
+            ratios.Add(-1);
+            ratios.Add(-1);
+            for (int i = 2; i < rhsValues.Length; i++)
             {
                 double ratio = CalculateRatio(pivotColumn[i], rhsValues[i]);
                 ratios.Add(ratio);
@@ -98,7 +106,7 @@ namespace ORSProjectModels
 
         private static int FindRowIndex(List<double> ratios, double number)
         {
-            for (int i = 0; i < ratios.Count; i++)
+            for (int i = 2; i < ratios.Count; i++)
             {
                 if (ratios[i] == number)
                 {
@@ -115,7 +123,8 @@ namespace ORSProjectModels
 
         private static bool CheckIfDoneWithFirstPhase(double[][] table)
         {
-            if (table[0][table.Length - 1] == 0)
+            int rhsColumnIndex = table[0].Length - 1;
+            if (table[0][rhsColumnIndex] == 0)
             {
                 return true;
             }
