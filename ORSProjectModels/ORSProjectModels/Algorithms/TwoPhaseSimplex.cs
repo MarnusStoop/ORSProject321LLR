@@ -37,7 +37,7 @@ namespace ORSProjectModels
                 Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables, table));
             }
             Model modelForSimplex = model;
-            modelForSimplex.CanonicalForm = table;
+            modelForSimplex.CanonicalForm = CanonicalGenerator.GenerateSecondPhaseForTwoPhaseCanonical(modelForSimplex, table);
             return PrimalSimplex.Solve(modelForSimplex);
         }
 
@@ -115,7 +115,7 @@ namespace ORSProjectModels
 
         private static bool CheckIfDoneWithFirstPhase(double[][] table)
         {
-            if (table[0][table.Length-1] == 0)
+            if (table[0][table.Length - 1] == 0)
             {
                 return true;
             }

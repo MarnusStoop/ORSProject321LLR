@@ -210,7 +210,7 @@ namespace ORSProjectModels
                 double value = GetDecisionVariableValue(model.Constraints, item, artificalConstraintIndices);
                 converted.Add(value);
             }
-            int numberOfAdditionalVariables = slackVariableIndices.Count+excessVariableIndices.Count+artificalVariableIndices.Count;
+            int numberOfAdditionalVariables = slackVariableIndices.Count + excessVariableIndices.Count + artificalVariableIndices.Count;
             for (int i = 0; i < numberOfAdditionalVariables; i++)
             {
                 converted.Add(0);
@@ -323,66 +323,51 @@ namespace ORSProjectModels
             model.DecisionVariables.Add("a" + (index + 1));
         }
 
-        private static double[][] GenerateSecondPhaseForTwoPhaseCanonical(Model model)
+        public static double[][] GenerateSecondPhaseForTwoPhaseCanonical(Model model, double[][] endOfPhase1Table)
         {
-            double[][] canonical;
-            int numberOfRows = 0;
+            double[][] canonical = endOfPhase1Table;
+            List<int> decisionVariableIndices = FindDecisionVariableIndices(model.DecisionVariables);
+            List<int> slackVariableIndices = FindSlackVariableIndices(model.DecisionVariables);
+            List<int> excessVariableIndices = FindExcessVariableIndices(model.DecisionVariables);
+            List<int> artificalVariableIndices = FindArtificialVariableIndices(model.DecisionVariables);
+            List<int> basicArtificalVariableIndices = FindBasicArtificialVariableIndices(endOfPhase1Table, artificalVariableIndices);
+            int numberOfColumns = (decisionVariableIndices.Count + slackVariableIndices.Count + excessVariableIndices.Count + basicArtificalVariableIndices.Count) + 1;
+            double[][] newCanonical = new double[canonical.Length - 1][];
+            List<int> indicesToCopy = (List<int>)decisionVariableIndices.Concat(slackVariableIndices).Concat(excessVariableIndices).Concat(basicArtificalVariableIndices);
+            int rhsIndex = canonical[0].Length - 1;
+            for (int i = 1; i < canonical.Length; i++)
+            {
+                for (int j = 0; j < indicesToCopy.Count; j++)
+                {
+                    newCanonical[i - 1][j] = canonical[i][indicesToCopy[j]];
+                }
+                newCanonical[i - 1][numberOfColumns - 1] = canonical[i][rhsIndex];
+            }
+            return newCanonical;
+        }
 
-            for (int i = 0; i < model.Constraints.Count; i++)
+        private static List<int> FindBasicArtificialVariableIndices(double[][] table, List<int> artificalVariableIndices)
+        {
+            List<int> indices = new List<int>();
+            foreach (var item in artificalVariableIndices)
             {
-                numberOfRows++;
-                switch (model.Constraints[i].Sign)
+                double[] values = GetColumnValues(table, item);
+                if (SensitivityAnalysis.CheckIfBasicVariable(values))
                 {
-                    case Sign.Equal:
-                        AddSlackVariable(i);
-                        AddExcessVariable(i);
-                        AddArtificalVariable(i);
-                        break;
-                    case Sign.GreaterEqual:
-                        AddExcessVariable(i);
-                        AddArtificalVariable(i);
-                        break;
-                    case Sign.LessEqual:
-                        AddSlackVariable(i);
-                        break;
-                    default:
-                        break;
+                    indices.Add(item);
                 }
             }
-            int numberOfColumns = model.DecisionVariables.Count + 1;
-            canonical = new double[numberOfRows + 1][];
-            //Assign objective
-            canonical[0] = ConvertObjective();
-            for (int i = 0; i < model.Constraints.Count; i++)
+            return indices;
+        }
+
+        private static double[] GetColumnValues(double[][] table, int columnIndex)
+        {
+            List<double> values = new List<double>();
+            for (int i = 0; i < table.Length; i++)
             {
-                List<double> slacks = new List<double>();
-                List<double> excess = new List<double>();
-                foreach (var item in model.DecisionVariables)
-                {
-                    if (item.Contains("s"))
-                    {
-                        if (item == "s" + (i + 1))
-                        {
-                            slacks.Add(1);
-                        } else
-                        {
-                            slacks.Add(0);
-                        }
-                    } else if (item.Contains("e"))
-                    {
-                        if (item == "e" + (i + 1))
-                        {
-                            excess.Add(-1);
-                        } else
-                        {
-                            excess.Add(0);
-                        }
-                    }
-                }
-                double[] additionalVariables = slacks.Concat(excess).ToArray();
-                canonical[i + 1] = model.Constraints[i].Coefficients.Concat(additionalVariables).Concat(new double[] { model.Constraints[i].RHS }).ToArray();
+                values.Add(table[i][columnIndex]);
             }
-            return canonical;
+            return values.ToArray();
         }
 
         private static double[][] GenerateDualSimplexCanonical(Model model)
