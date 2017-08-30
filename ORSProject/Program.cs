@@ -16,11 +16,12 @@ namespace ORSProject
         static void Main(string[] args)
         {
             ofd.Filter = "Text Files|*.txt";
+            ofd.InitialDirectory = "Problem Files";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 List<string> data = FileHandler.Read(ofd.FileName);
                 Model mm = GenerateModelFromFile(data);
-                PrimalSimplex.Solve(mm);
+                DualSimplex.Solve(mm);
             }
             //Model m = GenerateSampleModel();
             //DualSimplex.Solve(m);

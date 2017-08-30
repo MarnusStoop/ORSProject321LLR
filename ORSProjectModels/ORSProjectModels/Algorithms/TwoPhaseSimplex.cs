@@ -8,7 +8,6 @@ namespace ORSProjectModels
     public static class TwoPhaseSimplex
     {
 
-
         private static Model model;
 
         public static double[][] Solve(Model _model)
@@ -37,7 +36,9 @@ namespace ORSProjectModels
                 table = Pivoting.PivotTable(table, pivotColumnIndex, pivotRowIndex);
                 Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables, table));
             }
-            return table;
+            Model modelForSimplex = model;
+            modelForSimplex.CanonicalForm = table;
+            return PrimalSimplex.Solve(modelForSimplex);
         }
 
         private static double[] GetRHSValues(double[][] table)
@@ -65,16 +66,8 @@ namespace ORSProjectModels
         private static int IdentifyPivotColumn(double[] zRow)
         {
             int pivotColumnIndex = 0;
-            //needs to change
-            if (model.OptimizationType == OptimizationType.min)
-            {
-                double lowestPositive = zRow.Where(x => x > 0).Max(x => x);
-                pivotColumnIndex = FindColumnIndex(zRow, lowestPositive);
-            } else
-            {
-                double highestNegative = zRow.Where(x => x < 0).Min(x => x);
-                pivotColumnIndex = FindColumnIndex(zRow, highestNegative);
-            }
+            double lowestPositive = zRow.Where(x => x > 0).Max(x => x);
+            pivotColumnIndex = FindColumnIndex(zRow, lowestPositive);
             return pivotColumnIndex;
         }
 
@@ -92,8 +85,6 @@ namespace ORSProjectModels
 
         private static int IdentifyPivotRow(double[] pivotColumn, double[] rhsValues)
         {
-
-            //needs to change
             List<double> ratios = new List<double>();
             for (int i = 0; i < rhsValues.Length; i++)
             {
@@ -119,13 +110,15 @@ namespace ORSProjectModels
 
         private static double CalculateRatio(double columnValue, double rhsValue)
         {
-            //needs to change
             return rhsValue / columnValue;
         }
 
         private static bool CheckIfDoneWithFirstPhase(double[][] table)
         {
-            // to be done
+            if (table[0][table.Length-1] == 0)
+            {
+                return true;
+            }
             return false;
         }
 

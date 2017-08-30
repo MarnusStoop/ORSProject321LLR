@@ -41,7 +41,7 @@ namespace ORSProjectModels
                 Console.WriteLine(CommonFunctions.GenerateTableIteration(model.DecisionVariables, table));
             }
             Model modelForSimplex = model;
-            model.CanonicalForm = table;
+            modelForSimplex.CanonicalForm = table;
             return PrimalSimplex.Solve(modelForSimplex);
         }
 

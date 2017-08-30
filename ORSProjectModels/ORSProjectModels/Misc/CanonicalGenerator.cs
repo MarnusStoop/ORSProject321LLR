@@ -110,10 +110,10 @@ namespace ORSProjectModels
             int numberOfColumns = model.Constraints.Count;
             List<double> converted = new List<double>();
             converted.AddRange(model.ObjectiveFunction);
-            int numberOfSEVariables = (from dv in model.DecisionVariables
-                                       where dv.Contains("s") || dv.Contains("e")
-                                       select dv).Count();
-            for (int i = 0; i < numberOfSEVariables; i++)
+            int numberOfSEAVariables = (from dv in model.DecisionVariables
+                                        where dv.Contains("s") || dv.Contains("e") || dv.Contains("a")
+                                        select dv).Count();
+            for (int i = 0; i < numberOfSEAVariables; i++)
             {
                 converted.Add(0);
             }
@@ -154,6 +154,8 @@ namespace ORSProjectModels
             int numberOfColumns = model.DecisionVariables.Count + 1;
             canonical = new double[numberOfRows + 2][];
             //Assign objective
+            canonical[0] = GenerateWRow();
+            canonical[1] = ConvertObjective();
             for (int i = 0; i < model.Constraints.Count; i++)
             {
                 List<double> slacks = new List<double>();
@@ -193,8 +195,7 @@ namespace ORSProjectModels
                 double[] additionalVariables = slacks.Concat(excess).Concat(artifical).ToArray();
                 canonical[i + 2] = model.Constraints[i].Coefficients.Concat(additionalVariables).Concat(new double[] { model.Constraints[i].RHS }).ToArray();
             }
-            canonical[0] = GenerateWRow();
-            canonical[1] = ConvertObjective();
+
             return canonical;
         }
 
@@ -208,6 +209,13 @@ namespace ORSProjectModels
             for (int i = 0; i < numberOfSEVariables; i++)
             {
                 converted.Add(0);
+            }
+            int numberOfAVariables = (from dv in model.DecisionVariables
+                                      where dv.Contains("a")
+                                      select dv).Count();
+            for (int i = 0; i < numberOfAVariables; i++)
+            {
+                converted.Add(-1);
             }
             converted.Add(0);
             return converted.ToArray();
@@ -346,9 +354,9 @@ namespace ORSProjectModels
 
         private static bool isExcessRow(double[] values)
         {
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 0; i < values.Length - 1; i++)
             {
-                if (i < model.DecisionVariables.Count && model.DecisionVariables[i].Contains("e"))
+                if (model.DecisionVariables[i].Contains("e"))
                 {
                     if (values[i] == -1)
                     {
