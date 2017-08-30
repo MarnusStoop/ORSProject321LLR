@@ -136,8 +136,6 @@ namespace ORSProjectModels
                 switch (model.Constraints[i].Sign)
                 {
                     case Sign.Equal:
-                        AddSlackVariable(i);
-                        AddExcessVariable(i);
                         AddArtificalVariable(i);
                         break;
                     case Sign.GreaterEqual:
@@ -202,23 +200,122 @@ namespace ORSProjectModels
         private static double[] GenerateWRow()
         {
             List<double> converted = new List<double>();
-            converted.AddRange(model.ObjectiveFunction);
-            int numberOfSEVariables = (from dv in model.DecisionVariables
-                                       where dv.Contains("s") || dv.Contains("e")
-                                       select dv).Count();
-            for (int i = 0; i < numberOfSEVariables; i++)
+            List<int> artificalConstraintIndices = FindAritificalConstraintIndices(model.Constraints);
+            List<int> decisionVariableIndices = FindDecisionVariableIndices(model.DecisionVariables);
+            List<int> slackVariableIndices = FindSlackVariableIndices(model.DecisionVariables);
+            List<int> excessVariableIndices = FindExcessVariableIndices(model.DecisionVariables);
+            List<int> artificalVariableIndices = FindArtificialVariableIndices(model.DecisionVariables);
+            foreach (var item in decisionVariableIndices)
+            {
+                double value = GetDecisionVariableValue(model.Constraints, item, artificalConstraintIndices);
+                converted.Add(value);
+            }
+            int numberOfAdditionalVariables = slackVariableIndices.Count+excessVariableIndices.Count+artificalVariableIndices.Count;
+            for (int i = 0; i < numberOfAdditionalVariables; i++)
             {
                 converted.Add(0);
             }
-            int numberOfAVariables = (from dv in model.DecisionVariables
-                                      where dv.Contains("a")
-                                      select dv).Count();
-            for (int i = 0; i < numberOfAVariables; i++)
+            foreach (var item in slackVariableIndices)
             {
-                converted.Add(-1);
+                converted[item] = 0;
             }
-            converted.Add(0);
+            foreach (var item in excessVariableIndices)
+            {
+                converted[item] = -1;
+            }
+            foreach (var item in artificalVariableIndices)
+            {
+                converted[item] = 0;
+            }
+            double rhsValue = GetRhsValue(model.Constraints, artificalConstraintIndices);
+            converted.Add(rhsValue);
             return converted.ToArray();
+        }
+
+        private static double GetDecisionVariableValue(List<Constraint> constraints, int decisionVariableIndex, List<int> artificalConstraintIndices)
+        {
+            double value = 0;
+            for (int i = 0; i < artificalConstraintIndices.Count; i++)
+            {
+                value += constraints[i].Coefficients[decisionVariableIndex];
+            }
+            return value;
+        }
+
+        private static double GetRhsValue(List<Constraint> constraints, List<int> artificalConstraintIndices)
+        {
+            double value = 0;
+            for (int i = 0; i < artificalConstraintIndices.Count; i++)
+            {
+                value += constraints[i].RHS;
+            }
+            return value;
+        }
+
+        private static List<int> FindDecisionVariableIndices(List<string> decisionVariables)
+        {
+            List<int> decisionVariableIndices = new List<int>();
+            for (int i = 0; i < decisionVariables.Count; i++)
+            {
+                if (decisionVariables[i].Contains('x'))
+                {
+                    decisionVariableIndices.Add(i);
+                }
+            }
+            return decisionVariableIndices;
+        }
+
+        private static List<int> FindAritificalConstraintIndices(List<Constraint> constraints)
+        {
+            List<int> artificalConstrainIndices = new List<int>();
+            for (int i = 0; i < constraints.Count; i++)
+            {
+                if (constraints[i].Sign == Sign.LessEqual)
+                {
+                    continue;
+                }
+                artificalConstrainIndices.Add(i);
+            }
+            return artificalConstrainIndices;
+        }
+
+        private static List<int> FindSlackVariableIndices(List<string> decisionVariables)
+        {
+            List<int> slackVariableIndices = new List<int>();
+            for (int i = 0; i < decisionVariables.Count; i++)
+            {
+                if (decisionVariables[i].Contains('s'))
+                {
+                    slackVariableIndices.Add(i);
+                }
+            }
+            return slackVariableIndices;
+        }
+
+        private static List<int> FindExcessVariableIndices(List<string> decisionVariables)
+        {
+            List<int> excessVariableIndices = new List<int>();
+            for (int i = 0; i < decisionVariables.Count; i++)
+            {
+                if (decisionVariables[i].Contains('e'))
+                {
+                    excessVariableIndices.Add(i);
+                }
+            }
+            return excessVariableIndices;
+        }
+
+        private static List<int> FindArtificialVariableIndices(List<string> decisionVariables)
+        {
+            List<int> artificalVariableIndices = new List<int>();
+            for (int i = 0; i < decisionVariables.Count; i++)
+            {
+                if (decisionVariables[i].Contains('a'))
+                {
+                    artificalVariableIndices.Add(i);
+                }
+            }
+            return artificalVariableIndices;
         }
 
         private static void AddArtificalVariable(int index)
