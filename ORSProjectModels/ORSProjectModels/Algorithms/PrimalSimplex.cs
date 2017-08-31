@@ -27,6 +27,7 @@ namespace ORSProjectModels
             //    return AnswerGenerator.GenerateInfeasibleAnswer(InfeasiblityReason.UnsolvableWithAlgorithm);
             //}
             Console.WriteLine(model.GenerateDisplayableCanonical());
+            FileHandler.Append(model.GenerateDisplayableCanonical(), "output.txt");
             while (CheckIfOptimal(table) == false)
             {
                 //Console.WriteLine("Running");

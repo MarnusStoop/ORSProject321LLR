@@ -42,6 +42,7 @@ namespace ORSProjectModels
                 }
                 displayable += "\n";
             }
+            FileHandler.Append(displayable, "output.txt");
             return displayable;
         }
 

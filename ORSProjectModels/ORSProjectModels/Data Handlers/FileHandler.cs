@@ -92,6 +92,10 @@ namespace ORSProjectModels
         /// <param name="filePath">Path to the file</param>
         public static void Append(string data, string filePath)
         {
+            //if (!File.Exists(filePath))
+            //{
+            //    File.Create(filePath);
+            //}
             FileStream streamFile = new FileStream(filePath, FileMode.Append, FileAccess.Write);
             StreamWriter writer = new StreamWriter(streamFile);
             writer.Write(data);

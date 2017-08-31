@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ORSProjectModels;
 using System.Windows.Forms;
+using System.IO;
 
 namespace ORSProject
 {
@@ -24,6 +25,10 @@ namespace ORSProject
             LoadModel();
             while (isRunning)
             {
+                if (File.Exists("output.txt"))
+                {
+                    File.Delete("output.txt");
+                }
                 Console.Clear();
                 DisplayMainMenu();
             }
@@ -113,27 +118,27 @@ namespace ORSProject
 
         private static void SolveWithRevisedPrimalSimplex()
         {
-
+            Console.WriteLine("Not implemented");
         }
 
         private static void SolveWithRevisedTwoPhaseSimplex()
         {
-
+            Console.WriteLine("Not implemented");
         }
 
         private static void SolveWithRevisedDualSimplex()
         {
-
+            Console.WriteLine("Not implemented");
         }
 
         private static void SolveWithBranchAndBound()
         {
-
+            Console.WriteLine("Not implemented");
         }
 
         private static void SolveWithCuttingPlane()
         {
-
+            Console.WriteLine("Not implemented");
         }
 
         private static void LoadModel()
@@ -155,10 +160,12 @@ namespace ORSProject
             if (answer.Infeasibility != null)
             {
                 Console.WriteLine(answer.Infeasibility);
+                FileHandler.Append(answer.ToString(), "output.txt");
                 Console.ReadLine();
             } else
             {
                 Console.WriteLine(answer.ToString());
+                FileHandler.Append(answer.ToString(), "output.txt");
                 Console.ReadLine();
             }
         }

@@ -23,6 +23,7 @@ namespace ORSProjectModels
             }
             double[][] table = model.CanonicalForm;
             Console.WriteLine(model.GenerateDisplayableCanonical());
+            FileHandler.Append(model.GenerateDisplayableCanonical(), "output.txt");
             while (CheckIfDoneWithFirstPhase(table) == false)
             {
                 //Console.WriteLine("Running");
